@@ -2,6 +2,17 @@
 # Crypto Wallet API
 A virtual wallet to manage Bitcoin, Litecoin and Dogecoin, having real addresses but fictitious transactions, with no real value. Made for study purposes, but can be useful for personal projects and learning
 
+### Tecnology Stack
+ * <b>Spring Boot 3.2.2</b>
+ * <b>MongoDB</b>
+ * <b>Docker</b>
+
+### Integration and Security
+ * <b>Spring Cloud OpenFeign:</b> employed to facilitate integration with third-party system.
+ * <b>JWT Token-Based Authentication:</b> is the foundational authorization mechanism of the application.
+ * <b>Spring Security:</b> ensure comprehensive protection of resources and endpoints.
+
+
 ## Getting Started
 Make sure to have installed
 * Docker
@@ -20,7 +31,7 @@ Go to the project root directory
 cd /Virtual-Wallet-API-Project/VirtualWalletAPI
 ```
 
-Check https://www.blockcypher.com/ to generate your personal token. After it, goes to application.yaml and set your token to variable called token, it's necessary to use third party service
+Check https://www.blockcypher.com/ to generate your personal token. After it, goes to application.yaml and set your token to variable called token, it's necessary to use third-party service
 
 ```bash
 token: your-token
@@ -242,20 +253,21 @@ Returns a JSON object with the following properties:
 Returns a JSON object with the following properties:
 
     {
-    "id": "",
-    "name": "",
-    "email": "",
-    "cryptoAddress": {
-        "ltc": {
-            "address": "",
-            "quantity": 0.0
-        },
-        "btc": {
-            "address": "",
-            "quantity": 0.0
-        },
-        "doge": {
-            "address": "",
-            "quantity": 0.0
-        }
+        "id": "",
+        "name": "",
+        "email": "",
+        "cryptoAddress": {
+            "ltc": {
+                "address": "",
+                "quantity": 0.0
+            },
+            "btc": {
+                "address": "",
+                "quantity": 0.0
+            },
+            "doge": {
+                "address": "",
+                "quantity": 0.0
+            }
+        }    
     }

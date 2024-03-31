@@ -1,0 +1,31 @@
+logging:
+  level:
+    web: debug
+
+spring:
+  data:
+    mongodb:
+      host: mongodb://admin:admin@mongo:27017/virtualwallet
+      port: 27017
+      database: virtualwallet
+      username: admin
+      password: admin
+      auto-index-creation: true
+
+api:
+  security:
+    token:
+      secret: walletsecret
+
+token: your-token
+external:
+  api:
+    url: https://api.blockcypher.com/v1
+
+feign:
+  client:
+    config:
+      blockCypherWalletClient:
+        connectTimeout: 5000
+        readTimeout: 5000
+

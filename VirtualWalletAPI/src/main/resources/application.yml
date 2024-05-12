@@ -13,25 +13,13 @@ spring:
   kafka:
     bootstrap-servers:
       - kafka:9092
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-    consumer:
-      group-id: new-crypto-transaction
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-      properties:
-        spring:
-          json:
-            trusted:
-              packages: com.virtualwallet.demo.DTO.Transaction
 
 api:
   security:
     token:
       secret: walletsecret
 
-token: d1dd02bd3a714b93bc964236bf604075 # Your personal blockcypher token here
+token: # Your personal blockcypher token here
 external:
   api:
     url: https://api.blockcypher.com/v1

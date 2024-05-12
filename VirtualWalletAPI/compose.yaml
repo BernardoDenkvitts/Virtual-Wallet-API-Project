@@ -7,9 +7,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./:/app
-      - ./.m2:/root/.m2
     working_dir: /app
-    command: sh run.sh
     ports:
       - 8080:8080
       - 35729:35729
@@ -46,6 +44,7 @@ services:
       - zookeeper
     environment:
       KAFKA_ADVERTISED_HOST_NAME: kafka
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
       KAFKA_DELETE_TOPIC_ENABLE: 'true'

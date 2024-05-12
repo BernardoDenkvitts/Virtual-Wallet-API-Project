@@ -6,10 +6,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @RestControllerAdvice
 public class ExceptionsHandler
@@ -63,9 +63,9 @@ public class ExceptionsHandler
                 .build();
     }
 
-    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ExceptionHandler({HttpMessageNotReadableException.class, MethodArgumentTypeMismatchException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponseDTO handlerMessageNotReadableException(HttpMessageNotReadableException exception, HttpServletRequest request)
+    public ErrorResponseDTO handlerMessageNotReadableException(Exception exception, HttpServletRequest request)
     {
         String message = "";
         if(exception.getMessage().contains("CryptoType"))
@@ -79,12 +79,7 @@ public class ExceptionsHandler
                 .build();
     }
 
-    @ExceptionHandler(
-        {
-            AuthenticationException.class,
-            BadCredentialsException.class
-        }
-    )
+    @ExceptionHandler({AuthenticationException.class, BadCredentialsException.class})
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ErrorResponseDTO handlerAuthenticationException(Exception exception, HttpServletRequest request)
     {
@@ -95,5 +90,4 @@ public class ExceptionsHandler
                 .path(request.getServletPath())
                 .build();
     }
-
 }

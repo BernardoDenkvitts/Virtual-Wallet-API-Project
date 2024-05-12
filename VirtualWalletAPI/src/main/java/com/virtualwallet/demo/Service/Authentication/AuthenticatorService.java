@@ -8,8 +8,8 @@ import com.virtualwallet.demo.Exception.BadRequestException;
 import com.virtualwallet.demo.Model.User.User;
 import com.virtualwallet.demo.Repository.UserRepository;
 import com.virtualwallet.demo.Service.Authentication.Token.IToken;
-import com.virtualwallet.demo.Service.CryptoWallet.IWallet;
 import com.virtualwallet.demo.Mappers.Authentication.IAuthenticatorMapper;
+import com.virtualwallet.demo.Service.CryptoWallet.ICryptoWalletProducer;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -17,31 +17,32 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
+
 
 @Service
 public class AuthenticatorService implements IAuthenticator
 {
     private final UserRepository userRepository;
-    private final IWallet wallet;
     private final IAuthenticatorMapper authenticationMapper;
     private final AuthenticationManager authenticationManager;
     private final IToken tokenService;
+    private final ICryptoWalletProducer cryptoWalletProducer;
     private static final String EMAIL_ALREADY_IN_USE = "Email Already In Use";
     private static final String EMAIL_NOT_FOUND = "Email Not Found";
 
     public AuthenticatorService(
         UserRepository userRepository,
-        IWallet wallet,
         IAuthenticatorMapper authenticationMapper,
         AuthenticationManager authenticationManager,
-        IToken tokenService
-    )
+        IToken tokenService,
+        ICryptoWalletProducer cryptoWalletProducer)
     {
         this.userRepository = userRepository;
-        this.wallet = wallet;
         this.authenticationMapper = authenticationMapper;
         this.authenticationManager = authenticationManager;
         this.tokenService = tokenService;
+        this.cryptoWalletProducer = cryptoWalletProducer;
     }
 
     @Override
@@ -55,9 +56,11 @@ public class AuthenticatorService implements IAuthenticator
 
         User newUser = authenticationMapper.newAccountRequestDtoToUser(newAccountRequestDTO);
         newUser.setPswd(new BCryptPasswordEncoder().encode(newUser.getPassword()));
-        newUser.setCryptosAddress(wallet.createWallet());
-
+        newUser.setCryptosAddress(new HashMap<>());
         userRepository.save(newUser);
+
+        cryptoWalletProducer.sendCryptoWalletRequest(newUser.getId());
+
         return newUser.getId();
     }
 

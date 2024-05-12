@@ -20,6 +20,7 @@ import com.virtualwallet.demo.Service.Authentication.IAuthenticator;
 import com.virtualwallet.demo.Service.CryptoWallet.Client.IWalletClient;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.dao.DuplicateKeyException;
@@ -51,11 +52,10 @@ class CryptoWalletProjectApplicationTests
 	private static MongoDatabase mongoDatabase;
 	private static MongoTemplate mongoTemplate;
 
-
 	@BeforeAll
 	public static void setUpDB()
 	{
-		String connectionString = "mongodb://admin:admin@localhost:27014/virtualwallet";
+		String connectionString = "mongodb://admin:admin@mongodb:27017/virtualwallet";
 		mongoClient = MongoClients.create(connectionString);
 		mongoDatabase = mongoClient.getDatabase("virtualwallet");
 		mongoTemplate = new MongoTemplate(mongoClient, "virtualwallet");
@@ -111,15 +111,13 @@ class CryptoWalletProjectApplicationTests
 		@Test
 		public void should_create_TransactionResponseDTO()
 		{
-			Transaction transaction = new Transaction();
-			transaction.setId(null);
+			TransactionRequestDTO transaction = new TransactionRequestDTO();
 			transaction.setInputAddress("1576dbdab2589c28dd915e597edeec12a0284b83245b2ba6743c5071aab81d3b7a");
 			transaction.setOutputAddress("9542dbdab2589c28dd915e597edeec12a0284b83245b2ba6743c5071aab81d1z9j");
 			transaction.setQuantity(100.0);
 			transaction.setCryptoType(CryptoType.doge);
-			transaction.setTimestamp(LocalDateTime.now());
 
-			TransactionResponseDTO transactionResponseDTO = transactionMapper.transactionToTransactionResponseDTO(transaction);
+			TransactionResponseDTO transactionResponseDTO = transactionMapper.transactionRequestDTOToTransactionResponseDTO(transaction);
 			assertThat(transactionResponseDTO).isNotNull();
 			assertThat(transactionResponseDTO.getCryptoType()).isEqualTo(CryptoType.doge);
 			assertThat(transactionResponseDTO.getTimestamp()).isNotNull();

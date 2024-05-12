@@ -1,17 +1,35 @@
 
 # Crypto Wallet API
-A virtual wallet to manage Bitcoin, Litecoin and Dogecoin, having real addresses but fictitious transactions, with no real value. Made for study purposes, but can be useful for personal projects and learning
+A virtual wallet to manage Bitcoin, Litecoin and Dogecoin,
+having real addresses but fictitious transactions, 
+with no real value. Made for study purposes, but can be useful
+for personal projects and learning
 
-### Tecnology Stack
+
+### Technology Stack
  * <b>Spring Boot 3.2.2</b>
+ * <b>JUnit 5.10.2</b>
  * <b>MongoDB</b>
  * <b>Docker</b>
+ * <b>Apache Kafka</b>
 
 ### Integration and Security
  * <b>Spring Cloud OpenFeign:</b> employed to facilitate integration with third-party system.
- * <b>JWT Token-Based Authentication:</b> is the foundational authorization mechanism of the application.
+ * <b>JWT Token-Based Authentication:</b> is the foundational authorization mechanism of the application. Valid for one hour.
  * <b>Spring Security:</b> ensure comprehensive protection of resources and endpoints.
 
+### API Architecture
+![API.png](VirtualWalletAPI%2FApiArchiteture%2FAPI.png)
+
+#### <b>Why Kafka ?</b>
+Kafka was introduced to handle asynchronous processing, 
+imagining a real world scenario where transactions can take a time 
+to be completed, same for the register endpoint, where it uses a third party
+API.
+
+#### <b>Extra information about the architecture</b>
+The API was developed trying to apply S.O.L.I.D principles and thinking about
+Clean Architecture
 
 ## Getting Started
 Make sure to have installed
@@ -194,18 +212,37 @@ Returns a JSON object with the following properties:
 Returns a JSON object with the following properties:
 
     {
-    "content": [
-        {
-            "inputAddress": "",
-            "outputAddress": "",
-            "quantity": 0.0,
-            "cryptoType": "",
-            "timestamp": "YYYY-MM-DDTHH:MM:SS.MS"
-        }
-    ],
-    "pageable": {
-        "pageNumber": 1,
-        "pageSize": 20,
+        "content": [
+            {
+                "inputAddress": "",
+                "outputAddress": "",
+                "quantity": 0.0,
+                "cryptoType": "",
+                "timestamp": "YYYY-MM-DDTHH:MM:SS.MS"
+            }
+        ],
+        "pageable": {
+            "pageNumber": 1,
+            "pageSize": 20,
+            "sort": [
+                {
+                    "direction": "ASC",
+                    "property": "timestamp",
+                    "ignoreCase": false,
+                    "nullHandling": "NATIVE",
+                    "ascending": true,
+                    "descending": false
+                }
+            ],
+            "offset": 0,
+            "unpaged": false,
+            "paged": true
+        },
+        "totalElements": 1,
+        "totalPages": 1,
+        "last": true,
+        "size": 20,
+        "number": 0,
         "sort": [
             {
                 "direction": "ASC",
@@ -216,29 +253,10 @@ Returns a JSON object with the following properties:
                 "descending": false
             }
         ],
-        "offset": 0,
-        "unpaged": false,
-        "paged": true
-    },
-    "totalElements": 1,
-    "totalPages": 1,
-    "last": true,
-    "size": 20,
-    "number": 0,
-    "sort": [
-        {
-            "direction": "ASC",
-            "property": "timestamp",
-            "ignoreCase": false,
-            "nullHandling": "NATIVE",
-            "ascending": true,
-            "descending": false
-        }
-    ],
-    "numberOfElements": 1,
-    "first": true,
-    "empty": false
-}
+        "numberOfElements": 1,
+        "first": true,
+        "empty": false
+    }
 
 ### User endpoint
 

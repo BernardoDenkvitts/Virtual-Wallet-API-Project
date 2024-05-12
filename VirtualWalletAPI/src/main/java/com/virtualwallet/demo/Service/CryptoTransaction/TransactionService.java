@@ -1,13 +1,11 @@
 package com.virtualwallet.demo.Service.CryptoTransaction;
 
-import com.virtualwallet.demo.DTO.Transaction.AddCryptoToAddress;
 import com.virtualwallet.demo.DTO.Transaction.TransactionRequestDTO;
 import com.virtualwallet.demo.DTO.Transaction.TransactionResponseDTO;
 import com.virtualwallet.demo.Exception.InsufficientFundsException;
 import com.virtualwallet.demo.Exception.NotFoundException;
 import com.virtualwallet.demo.Mappers.Transaction.ITransactionMapper;
 import com.virtualwallet.demo.Model.CryptoType;
-import com.virtualwallet.demo.Model.Transaction;
 import com.virtualwallet.demo.Model.User.CryptoAddress;
 import com.virtualwallet.demo.Model.User.User;
 import com.virtualwallet.demo.Repository.TransactionRepository;
@@ -21,35 +19,25 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
-import java.util.ArrayList;
 
 @Service
 public class TransactionService implements ITransaction
 {
     private final ITransactionMapper transactionMapper;
-    private final TransactionRepository repository;
+    private final TransactionRepository transactionRepository;
     private final UserRepository userRepository;
+    private final ITransactionProducer transactionProducer;
     private static final String USER_NOT_FOUND = "User Not Found";
     private static final String INSUFFICIENT_FUNDS = "Insufficient Funds";
 
-    public TransactionService(TransactionRepository repository, UserRepository userRepository, ITransactionMapper transactionMapper)
+    public TransactionService(TransactionRepository transactionRepository, UserRepository userRepository,
+                              ITransactionMapper transactionMapper, ITransactionProducer transactionProducer
+    )
     {
-        this.repository = repository;
+        this.transactionRepository = transactionRepository;
         this.userRepository = userRepository;
         this.transactionMapper = transactionMapper;
-    }
-
-    @Transactional
-    public String addCryptoToAddress(AddCryptoToAddress addCryptoToAddress)
-    {
-        User user = userRepository.findById(addCryptoToAddress.getUserId())
-                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
-        CryptoAddress cryptoAddress = user.getCryptosAddress().get(addCryptoToAddress.getCryptoType());
-        cryptoAddress.setQuantity(cryptoAddress.getQuantity() + addCryptoToAddress.getQuantity());
-
-        user.getCryptosAddress().put(addCryptoToAddress.getCryptoType(), cryptoAddress);
-        userRepository.save(user);
-        return "Quantity added";
+        this.transactionProducer = transactionProducer;
     }
 
     // If the output address is wrong, so the input user will lose that quantity;
@@ -65,27 +53,9 @@ public class TransactionService implements ITransaction
         CryptoAddress cryptoAddress = userInput.getCryptosAddress().get(transactionRequestDTO.getCryptoType());
         if (cryptoAddress.getQuantity() < transactionRequestDTO.getQuantity()) throw new InsufficientFundsException(INSUFFICIENT_FUNDS);
 
-        cryptoAddress.setQuantity(cryptoAddress.getQuantity() - transactionRequestDTO.getQuantity());
-        userInput.getCryptosAddress().put(transactionRequestDTO.getCryptoType(), cryptoAddress);
-        ArrayList<User> usersToSave = new ArrayList<>();
-        usersToSave.add(userInput);
+        transactionProducer.sendTransaction(transactionRequestDTO, userInput.getId());
 
-        User userOutput = userRepository.findByCryptoTypeAndAddress(
-            transactionRequestDTO.getCryptoType().name(),
-            transactionRequestDTO.getOutputAddress()
-        );
-
-        if(userOutput != null)
-        {
-            CryptoAddress outputAddress = userOutput.getCryptosAddress().get(transactionRequestDTO.getCryptoType());
-            outputAddress.setQuantity(outputAddress.getQuantity() + transactionRequestDTO.getQuantity());
-            usersToSave.add(userOutput);
-        }
-        Transaction newTransaction = repository.save(
-                transactionMapper.transactionRequestDTOToTransaction(transactionRequestDTO)
-        );
-        userRepository.saveAll(usersToSave);
-        return transactionMapper.transactionToTransactionResponseDTO(newTransaction);
+        return transactionMapper.transactionRequestDTOToTransactionResponseDTO(transactionRequestDTO);
     }
 
     @Override
@@ -102,7 +72,7 @@ public class TransactionService implements ITransaction
                 pageable.getSortOr(Sort.by(Sort.Direction.ASC, "timestamp"))
         );
 
-        return repository.getTransactionByInputAddress(
+        return transactionRepository.getTransactionByInputAddress(
                 user.getCryptosAddress().get(cryptoType).getAddress(), paging
         );
     }

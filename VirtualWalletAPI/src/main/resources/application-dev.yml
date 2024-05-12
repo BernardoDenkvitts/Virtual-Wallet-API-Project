@@ -1,0 +1,36 @@
+server:
+  port: 80
+spring:
+  devtools:
+    remote:
+      secret: DEVSECRETPASSWORD633421
+  data:
+    mongodb:
+      host: localhost
+      port: 27010
+      database: virtualwallet
+      username: admin
+      password: admin
+      auto-index-creation: true
+
+  kafka:
+    bootstrap-servers:
+      - localhost:9092
+
+api:
+  security:
+    token:
+      secret: walletsecret
+
+
+token: #d1dd02bd3a714b93bc964236bf604075 # Your personal blockcypher token here
+external:
+  api:
+    url: https://api.blockcypher.com/v1
+
+feign:
+  client:
+    config:
+      blockCypherWalletClient:
+        connectTimeout: 5000
+        readTimeout: 5000

@@ -12,7 +12,7 @@ import java.util.UUID;
 @Service
 public class WalletService implements IWallet
 {
-    private IWalletClient walletClient;
+    private final IWalletClient walletClient;
 
     public WalletService(IWalletClient walletClient)
     {
@@ -26,11 +26,7 @@ public class WalletService implements IWallet
         // Create address for each type of crypto
         for(CryptoType type: CryptoType.values())
         {
-            String name = UUID.randomUUID().toString().substring(0, 20);
-            if (name.charAt(0) == '1' || name.charAt(0) == '3'){
-                name = 'A' + name.substring(1);
-                System.out.println("novo nome " +  name );
-            }
+            String name = createWalletName();
             String cryptoWallet = walletClient.createCryptoWallet(
                     new NewWalletDTO(name),
                     type.name()
@@ -39,8 +35,16 @@ public class WalletService implements IWallet
             CryptoAddress cryptoAddress = walletClient.createAddressToCryptoWallet(type.name(), cryptoWallet);
             userWallet.put(type, cryptoAddress);
         }
-
         return userWallet;
+    }
+
+    private String createWalletName()
+    {
+        String name = UUID.randomUUID().toString().substring(0, 20);
+        if (name.charAt(0) == '1' || name.charAt(0) == '3'){
+            name = 'A' + name.substring(1);
+        }
+        return name;
     }
 
 }

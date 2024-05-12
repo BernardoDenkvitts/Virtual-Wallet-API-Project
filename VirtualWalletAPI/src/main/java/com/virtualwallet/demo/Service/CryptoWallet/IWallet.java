@@ -8,7 +8,7 @@ import java.util.HashMap;
 public interface IWallet
 {
     /**
-     * Create a wallet for each type of crypto (just bcy at moment)
+     * Create a wallet for each type of crypto (btc, doge, ltc)
      *
      * @return HashMap containing all crypto addresses,
      * representing a new wallet (HashMap<CryptoType, CryptoAddress>)

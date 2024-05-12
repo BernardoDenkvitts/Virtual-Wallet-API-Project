@@ -6,6 +6,7 @@ import com.virtualwallet.demo.DTO.Authentication.LoginResponseDTO;
 import com.virtualwallet.demo.DTO.Authentication.NewAccountRequestDTO;
 import com.virtualwallet.demo.Service.Authentication.IAuthenticator;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -35,5 +36,4 @@ public class AuthenticatorController
     {
         return ResponseEntity.ok(authentication.login(loginRequestDTO));
     }
-
 }

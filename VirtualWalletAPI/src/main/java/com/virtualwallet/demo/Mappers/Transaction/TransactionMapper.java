@@ -6,6 +6,8 @@ import com.virtualwallet.demo.Model.Transaction;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+
 
 @Component
 public class TransactionMapper implements ITransactionMapper
@@ -18,13 +20,13 @@ public class TransactionMapper implements ITransactionMapper
 
     public Transaction transactionRequestDTOToTransaction(TransactionRequestDTO dto)
     {
-        Transaction transaction = modelMapper.map(dto, Transaction.class);
-        return transaction;
+        return modelMapper.map(dto, Transaction.class);
     }
 
-    public TransactionResponseDTO transactionToTransactionResponseDTO(Transaction transaction)
+    public TransactionResponseDTO transactionRequestDTOToTransactionResponseDTO(TransactionRequestDTO dto)
     {
-        TransactionResponseDTO response = modelMapper.map(transaction, TransactionResponseDTO.class);
-        return response;
+        TransactionResponseDTO transactionResponseDTO = modelMapper.map(dto, TransactionResponseDTO.class);
+        transactionResponseDTO.setTimestamp(LocalDateTime.now());
+        return transactionResponseDTO;
     }
 }

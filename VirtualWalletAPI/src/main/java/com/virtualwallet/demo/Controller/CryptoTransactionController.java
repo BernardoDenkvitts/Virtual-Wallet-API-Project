@@ -1,6 +1,5 @@
 package com.virtualwallet.demo.Controller;
 
-import com.virtualwallet.demo.DTO.Transaction.AddCryptoToAddress;
 import com.virtualwallet.demo.DTO.Transaction.TransactionRequestDTO;
 import com.virtualwallet.demo.DTO.Transaction.TransactionResponseDTO;
 import com.virtualwallet.demo.Model.CryptoType;
@@ -23,12 +22,6 @@ public class CryptoTransactionController
         this.transactionService = transactionService;
     }
 
-    @PostMapping
-    public ResponseEntity<String> addCryptoQuantityToAddress(@RequestBody AddCryptoToAddress addCryptoToAddress)
-    {
-        return ResponseEntity.ok(transactionService.addCryptoToAddress(addCryptoToAddress));
-    }
-
     @PostMapping("/{userId}/send")
     public ResponseEntity<TransactionResponseDTO> sendCryptoToDifferentAddress
     (
@@ -39,7 +32,6 @@ public class CryptoTransactionController
     {
         TransactionResponseDTO newTransaction = transactionService.sendCryptoToAddress(transactionRequestDTO, userId, principal);
         return ResponseEntity.accepted().body(newTransaction);
-
     }
 
     @GetMapping("/{userId}/{cryptoType}")

@@ -12,14 +12,14 @@ import java.util.Map;
 
 public class UserAuthority
 {
-    private IAuthorityStrategy strategy;
-    private final Map<Roles, IAuthorityStrategy> strategiesMap = Map.of(
-        Roles.ADMIN, new AdminAuthorityStrategy(),
-        Roles.USER, new BasicUserAuthorityStrategy()
-    );
+    private final IAuthorityStrategy strategy;
 
     public UserAuthority(Roles role)
     {
+        Map<Roles, IAuthorityStrategy> strategiesMap = Map.of(
+                Roles.ADMIN, new AdminAuthorityStrategy(),
+                Roles.USER, new BasicUserAuthorityStrategy()
+        );
         this.strategy = strategiesMap.get(role);
     }
 

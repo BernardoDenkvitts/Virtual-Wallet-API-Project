@@ -22,7 +22,7 @@ import java.util.Map;
 @EnableKafka
 public class KafkaConfig
 {
-    private final String bootstrapServers = "localhost:9092";
+    private final String bootstrapServers = "kafka:9092";
     private final String transactionGroupId = "new-crypto-transaction";
     private final String walletGroupId = "new-wallet";
     private final String trustedPackages = "com.virtualwallet.demo.DTO.Transaction";

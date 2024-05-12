@@ -131,33 +131,6 @@ Returns a JSON object with the following propertie:
     * doge
     * ltc
 
-#### Add crypto to address
-```http
-  POST /transaction
-```
-| Body   | Description                                                                                                                    |
-|:-------|:-------------------------------------------------------------------------------------------------------------------------------|
-| `json` | `JSON object containing data to add crypto to specific address, fields "inputAddress" and "outputAddress" should be the same ` |
-
-    {
-        "inputAddress": "",
-        "outputAddress": "",
-        "quantity": 0.0
-        "cryptoType": ""
-    }
-
-#### Response
-| Body   | Response Status |
-|:-------|:----------------|
-| `json` | `200`           |
-Returns JSON object, a String with the following message:
-* Quantity added
-
-
-    {
-        "Quantity added"
-    }
-
 #### Send crypto to different address
 ```http
   POST /transaction/{userId}/send
@@ -259,6 +232,29 @@ Returns a JSON object with the following properties:
     }
 
 ### User endpoint
+
+#### Add crypto to address
+```http
+  POST /user/{userId}/add/{cryptoType}/{quantity}
+```
+
+| Observation                          |
+|:-------------------------------------|
+| {quantity} path variable is a Double |
+
+    {}
+
+#### Response
+| Body   | Response Status |
+|:-------|:----------------|
+| `json` | `200`           |
+Returns JSON object, a String with the following message:
+* Quantity added
+
+
+    {
+        "Quantity added"
+    }
 
 #### Get user information
 ```http

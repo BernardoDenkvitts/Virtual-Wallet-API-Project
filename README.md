@@ -62,6 +62,7 @@ mvn clean install
 
 Starting containers (Application and Database)
 ```bash
+docker-compose build
 docker-compose up -d
 ```
 

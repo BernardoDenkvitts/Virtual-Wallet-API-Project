@@ -60,7 +60,7 @@ Build the project
 mvn clean install
 ```
 
-Starting containers (Application and Database)
+Starting containers (Application, Database, Zookeeper and Kafka)
 ```bash
 docker-compose build
 docker-compose up -d
@@ -69,7 +69,12 @@ docker-compose up -d
 
 ## API Reference
 ### Base URL
-localhost:8080/v1/
+<b> localhost:8080/v1/ </b>
+
+### Crypto types available:
+    * btc
+    * doge
+    * ltc
 
 ### Errors
 This API uses the following error codes:
@@ -126,11 +131,8 @@ Returns a JSON object with the following propertie:
         "login": ""
     }
 
+
 ### Transaction endpoints
-#### Crypto types:
-    * btc
-    * doge
-    * ltc
 
 #### Send crypto to different address
 ```http
@@ -239,18 +241,18 @@ Returns a JSON object with the following properties:
   POST /user/{userId}/add/{cryptoType}/{quantity}
 ```
 
-| Observation                          |
-|:-------------------------------------|
-| {quantity} path variable is a Double |
+| Parameter    | Type     | Description                   |
+|:-------------|:---------|:------------------------------|
+| `userId`     | `string` | **Required**. User id         |
+| `cryptoType` | `string` | **Required**. Crypto type     |
+| `quantity`   | `double` | **Required**. Quantity to add |
 
-    {}
 
 #### Response
 | Body   | Response Status |
 |:-------|:----------------|
 | `json` | `200`           |
 Returns JSON object, a String with the following message:
-* Quantity added
 
 
     {
@@ -261,6 +263,11 @@ Returns JSON object, a String with the following message:
 ```http
   GET /user/{userId}
 ```
+
+| Parameter    | Type     | Description                   |
+|:-------------|:---------|:------------------------------|
+| `userId`     | `string` | **Required**. User id         |
+
 #### Response
 | Body   | Response Status |
 |:-------|:----------------|

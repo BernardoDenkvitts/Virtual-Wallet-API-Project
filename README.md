@@ -19,17 +19,13 @@ for personal projects and learning
  * <b>Spring Security:</b> ensure comprehensive protection of resources and endpoints.
 
 ### API Architecture
-![API.png](VirtualWalletAPI%2FApiArchiteture%2FAPI.png)
+![API.png](VirtualWalletAPI%2FApiArchitecture%2FAPI.png)
 
 #### <b>Why Kafka ?</b>
 Kafka was introduced to handle asynchronous processing, 
 imagining a real world scenario where transactions can take a time 
 to be completed, same for the register endpoint, where it uses a third party
 API.
-
-#### <b>Extra information about the architecture</b>
-The API was developed trying to apply S.O.L.I.D principles and thinking about
-Clean Architecture
 
 ## Getting Started
 Make sure to have installed

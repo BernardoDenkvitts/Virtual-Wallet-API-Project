@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,6 +33,7 @@ public class TransactionConsumer
         this.userRepository = userRepository;
     }
 
+    @Transactional
     @KafkaListener(topics = "new-transaction", groupId = "new-crypto-transaction", containerFactory = "jsonKafkaListenerContainerFactory")
     public void receiveTransactionRequest(TransactionMessage message) {
         LOGGER.info("transaction received user {}, transaction {}", message.userInputId(), message.transactionRequestDTO().toString());

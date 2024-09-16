@@ -42,7 +42,6 @@ public class TransactionService implements ITransaction
 
     // If the output address is wrong, so the input user will lose that quantity;
     @Override
-    @Transactional
     public TransactionResponseDTO sendCryptoToAddress(
             TransactionRequestDTO transactionRequestDTO, String userId, Principal principal
     )

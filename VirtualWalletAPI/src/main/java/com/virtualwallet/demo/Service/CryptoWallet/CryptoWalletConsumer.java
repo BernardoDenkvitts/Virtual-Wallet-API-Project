@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 
@@ -25,6 +26,7 @@ public class CryptoWalletConsumer
         this.walletClient = walletClient;
     }
 
+    @Transactional
     @KafkaListener(topics = "new-crypto-wallet", groupId = "new-wallet", containerFactory = "stringKafkaListenerContainerFactory")
     public void receiveCryptoWalletRequest(String userId)
     {

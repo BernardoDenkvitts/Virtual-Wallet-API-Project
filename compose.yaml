@@ -1,0 +1,38 @@
+
+services:
+
+  zookeeper:
+    image: wurstmeister/zookeeper:latest
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: wurstmeister/kafka:latest
+    ports:
+      - "9092:9092"
+    links:
+      - zookeeper
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: localhost
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      KAFKA_DELETE_TOPIC_ENABLE: 'true'
+
+  mongodb:
+    image: mongo:latest
+    container_name: docker_mongo
+    environment:
+      - MONGO_INITDB_DATABASE=virtualwallet
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin
+    ports:
+      - "27010:27017"
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1"
+    volumes:
+      - walletdata:/tmp/data/db
+      - ./VirtualWalletAPI/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro
+
+volumes:
+  walletdata:

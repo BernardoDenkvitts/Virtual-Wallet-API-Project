@@ -30,7 +30,8 @@ public class KafkaConfig
     private final String walletGroupId = "new-wallet";
     private final String trustedPackages = "com.virtualwallet.demo.DTO.Transaction";
 
-    @Bean NewTopic newTransactionTopic()
+    @Bean
+    NewTopic newTransactionTopic()
     {
         return new NewTopic("new-transaction", 3, (short) 1);
     }
@@ -42,12 +43,12 @@ public class KafkaConfig
 
 
     @Bean
-    public KafkaTemplate<String, TransactionMessage> jsonKafkaTemplate() {
+    public KafkaTemplate<String, Object> jsonKafkaTemplate() {
         return new KafkaTemplate<>(jsonProducerFactory());
     }
 
     @Bean
-    public ProducerFactory<String, TransactionMessage> jsonProducerFactory() {
+    public ProducerFactory<String, Object> jsonProducerFactory() {
         Map<String, Object> configProps = new HashMap<>();
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);

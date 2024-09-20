@@ -34,14 +34,14 @@ func (e *EmailImpl) Send(email types.EmailDTO) error {
 			break
 		}
 
-		log.Printf("Fail to sent email : %s", err.Error())
+		log.Printf("Fail to send email : %s", err.Error())
 		try += 1
 	}
 
 	emailLog := types.NewEmailLog(types.EmailStatus.SUCCESS, email.From, email.To, email.Subject, "")
 
 	if try == 3 {
-		setFailData(emailLog, err.Error())
+		setEmailAsFailed(emailLog, err.Error())
 	}
 
 	e.Repository.Save(emailLog)
@@ -53,9 +53,9 @@ func formatEmailMessage(message string) string {
 	return "<p>" + message + "</p>"
 }
 
-func setFailData(emailLog *types.EmailLog, errorMessage string) *types.EmailLog {
+func setEmailAsFailed(emailLog *types.EmailLog, errorMessage string) *types.EmailLog {
 	emailLog.Status = types.EmailStatus.FAIL
 	emailLog.ErrorMessage = errorMessage
-	
+
 	return emailLog
 }

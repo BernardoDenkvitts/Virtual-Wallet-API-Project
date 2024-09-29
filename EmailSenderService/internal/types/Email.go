@@ -1,8 +1,13 @@
 package types
 
-import "time"
+import (
+	"time"
+
+	"github.com/go-playground/validator/v10"
+)
 
 type EmailStatusType int
+
 var EmailStatus = struct {
 	SUCCESS EmailStatusType
 	FAIL    EmailStatusType
@@ -12,10 +17,10 @@ var EmailStatus = struct {
 }
 
 type EmailDTO struct {
-	From    string
-	To      string
+	From    string `validate:"min=3"`
+	To      string `validate:"min=3"`
 	Subject string
-	Message string
+	Message string `validate:"min=1"`
 }
 
 func NewEmailDTO(from, to, subject, message string) EmailDTO {
@@ -47,4 +52,13 @@ func NewEmailLog(status EmailStatusType, from, to, subject string, errorMessage 
 		Timestamp:    time.Now(),
 		ErrorMessage: errorMessage,
 	}
+}
+
+func ValidateStruct(object any) error {
+	validate := validator.New()
+	if err := validate.Struct(object); err != nil {
+		return err
+	}
+
+	return nil
 }

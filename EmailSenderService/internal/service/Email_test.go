@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/BernardoDenkvitts/EmailSenderService/internal/infrastructure/smtp"
-	"github.com/BernardoDenkvitts/EmailSenderService/internal/repository"
+	"github.com/BernardoDenkvitts/EmailSenderService/internal/infrastructure/storage"
 	"github.com/BernardoDenkvitts/EmailSenderService/internal/types"
 	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
@@ -35,8 +35,8 @@ func getSmtpConfig() smtp.SMTPConfig {
 
 func getEmailService() *EmailImpl {
 	smtpServer := smtp.NewMailTrapServer(getSmtpConfig())
-	repository := repository.NewInMemoryRepository()
-	return NewEmailImpl(smtpServer, repository)
+	storage := storage.NewInMemoryStorage()
+	return NewEmailImpl(smtpServer, storage)
 }
 
 func TestSendEmail(t *testing.T) {
@@ -44,6 +44,6 @@ func TestSendEmail(t *testing.T) {
 	service := getEmailService()
 
 	email := types.NewEmailDTO("sender@gmail.com", "receiver@gmail.com", "Test Email", "Test email")
-	
+
 	assert.Nil(service.Send(email))
 }

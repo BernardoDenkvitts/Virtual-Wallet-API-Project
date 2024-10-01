@@ -4,21 +4,21 @@ import (
 	"log"
 
 	"github.com/BernardoDenkvitts/EmailSenderService/internal/infrastructure/smtp"
-	"github.com/BernardoDenkvitts/EmailSenderService/internal/repository"
+	"github.com/BernardoDenkvitts/EmailSenderService/internal/infrastructure/storage"
 	"github.com/BernardoDenkvitts/EmailSenderService/internal/types"
 )
 
 type IEmail interface {
-	Send(email types.EmailDTO) bool
+	Send(email types.EmailDTO) error
 }
 
 type EmailImpl struct {
 	SmtpServer smtp.ISmtpServer
-	Repository repository.IRepository
+	Storage    storage.IStorage
 }
 
-func NewEmailImpl(smtpServer smtp.ISmtpServer, repository repository.IRepository) *EmailImpl {
-	return &EmailImpl{SmtpServer: smtpServer, Repository: repository}
+func NewEmailImpl(smtpServer smtp.ISmtpServer, storage storage.IStorage) *EmailImpl {
+	return &EmailImpl{SmtpServer: smtpServer, Storage: storage}
 }
 
 func (e *EmailImpl) Send(email types.EmailDTO) error {
@@ -44,7 +44,7 @@ func (e *EmailImpl) Send(email types.EmailDTO) error {
 		setEmailAsFailed(emailLog, err.Error())
 	}
 
-	e.Repository.Save(emailLog)
+	e.Storage.Save(emailLog)
 
 	return err
 }

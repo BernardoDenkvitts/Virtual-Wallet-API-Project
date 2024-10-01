@@ -46,12 +46,17 @@ func (s *PostgreSQL) Init() error {
 }
 
 func (s *PostgreSQL) Save(emailLog *types.EmailLog) error {
+	tx, _ := s.db.Begin()
+
 	query := `INSERT INTO emaillog (status, email_from, email_to, subject, timestamp, errorMessage)
 			   VALUES ($1, $2, $3, $4, $5, $6)`
 	_, err := s.db.Exec(query, emailLog.Status, emailLog.From, emailLog.To, emailLog.Subject, emailLog.Timestamp, emailLog.ErrorMessage)
 	if err != nil {
+		tx.Rollback()
 		return err
 	}
+
+	tx.Commit()
 
 	log.Println("EmailLog saved")
 

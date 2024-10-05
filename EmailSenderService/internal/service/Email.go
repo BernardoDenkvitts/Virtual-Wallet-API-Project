@@ -27,7 +27,7 @@ func (e *EmailImpl) Send(email types.EmailDTO) error {
 	var err error
 	try := 0
 
-	for try < 3 {
+	for try < 3 {	
 		err = e.SmtpServer.SendEmail(email.From, email.To, email.Subject, formatEmailMessage(email.Message))
 		if err == nil {
 			log.Println("Email sent sucessfully")
@@ -39,7 +39,6 @@ func (e *EmailImpl) Send(email types.EmailDTO) error {
 	}
 
 	emailLog := types.NewEmailLog(types.EmailStatus.SUCCESS, email.From, email.To, email.Subject, "")
-
 	if try == 3 {
 		setEmailAsFailed(emailLog, err.Error())
 	}
@@ -50,7 +49,14 @@ func (e *EmailImpl) Send(email types.EmailDTO) error {
 }
 
 func formatEmailMessage(message string) string {
-	return "<p>" + message + "</p>"
+	return `
+		<div style="font-family: Arial, sans-serif; font-size: 16px; color: #333; background-color: #f9f9f9; padding: 20px; border: 1px solid #ddd; border-radius: 8px; max-width: 600px; margin: auto;">
+			<h2 style="text-align: center;">Transaction Status</h2>
+			<p style="text-align: center;">` + message + `</p>
+			<hr style="border: 0; height: 1px; background-color: #ddd;">
+			<p style="text-align: center; font-size: 12px; color: #999;">This is an automated message. Please do not reply.</p>
+		</div>
+	`
 }
 
 func setEmailAsFailed(emailLog *types.EmailLog, errorMessage string) *types.EmailLog {

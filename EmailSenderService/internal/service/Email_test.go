@@ -36,6 +36,7 @@ func getSmtpConfig() smtp.SMTPConfig {
 func getEmailService() *EmailImpl {
 	smtpServer := smtp.NewMailTrapServer(getSmtpConfig())
 	storage := storage.NewInMemoryStorage()
+	storage.Init()
 	return NewEmailImpl(smtpServer, storage)
 }
 
@@ -43,7 +44,7 @@ func TestSendEmail(t *testing.T) {
 	assert := assert.New(t)
 	service := getEmailService()
 
-	email := types.NewEmailDTO("sender@gmail.com", "receiver@gmail.com", "Test Email", "Test email")
+	email := types.NewEmailDTO("sender@gmail.com", "receiver@gmail.com", "Test", "Test email")
 
 	assert.Nil(service.Send(email))
 }

@@ -1,6 +1,8 @@
 package smtp
 
-import "gopkg.in/gomail.v2"
+import (
+	"gopkg.in/gomail.v2"
+)
 
 type SmtpServer struct {
 	config SMTPConfig
@@ -10,10 +12,10 @@ func NewSmtpServer(config SMTPConfig) *SmtpServer {
 	return &SmtpServer{config: config}
 }
 
-func (s *SmtpServer) SendEmail(from, to, subject, body string) error {
+func (s *SmtpServer) SendEmail(to, subject, body string) error {
 	msg := gomail.NewMessage()
 
-	msg.SetHeader("From", from)
+	msg.SetHeader("From", s.config.User)
 	msg.SetHeader("To", to)
 	msg.SetHeader("Subject", subject)
 	msg.SetBody("text/html", body)

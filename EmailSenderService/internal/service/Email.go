@@ -22,13 +22,13 @@ func NewEmailImpl(smtpServer *smtp.SmtpServer, storage storage.IStorage) *EmailI
 }
 
 func (e *EmailImpl) Send(email types.EmailDTO) error {
-	log.Printf("Sending email from %s to %s", email.From, email.To)
+	log.Printf("Sending email to %s", email.To)
 
 	var err error
 	try := 0
 
 	for try < 3 {
-		err = e.SmtpServer.SendEmail(email.From, email.To, email.Subject, formatEmailMessage(email.Subject, email.Message))
+		err = e.SmtpServer.SendEmail(email.To, email.Subject, formatEmailMessage(email.Subject, email.Message))
 		if err == nil {
 			log.Println("Email sent sucessfully")
 			break
@@ -38,7 +38,7 @@ func (e *EmailImpl) Send(email types.EmailDTO) error {
 		try += 1
 	}
 
-	emailLog := types.NewEmailLog(types.EmailStatus.SUCCESS, email.From, email.To, email.Subject, "")
+	emailLog := types.NewEmailLog(types.EmailStatus.SUCCESS, email.To, email.Subject, "")
 	if try == 3 {
 		setEmailAsFailed(emailLog, err.Error())
 	}

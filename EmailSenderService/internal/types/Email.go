@@ -18,7 +18,6 @@ var EmailStatus = struct {
 }
 
 type EmailDTO struct {
-	From    string `validate:"min=3"`
 	To      string `validate:"min=3"`
 	Subject string
 	Message string `validate:"min=1"`
@@ -26,7 +25,6 @@ type EmailDTO struct {
 
 func NewEmailDTO(to, subject, message string) EmailDTO {
 	return EmailDTO{
-		From:    os.Getenv("emailuser"),
 		To:      to,
 		Subject: subject,
 		Message: message,
@@ -43,11 +41,11 @@ type EmailLog struct {
 	ErrorMessage string
 }
 
-func NewEmailLog(status EmailStatusType, from, to, subject string, errorMessage string) *EmailLog {
+func NewEmailLog(status EmailStatusType, to, subject string, errorMessage string) *EmailLog {
 	return &EmailLog{
 		Id:           -1,
 		Status:       status,
-		From:         from,
+		From:         os.Getenv("emailuser"),
 		To:           to,
 		Subject:      subject,
 		Timestamp:    time.Now(),

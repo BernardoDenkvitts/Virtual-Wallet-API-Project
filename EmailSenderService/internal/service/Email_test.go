@@ -2,28 +2,18 @@ package service
 
 import (
 	"os"
-	"path/filepath"
 	"strconv"
 	"testing"
 
 	"github.com/BernardoDenkvitts/EmailSenderService/internal/infrastructure/smtp"
 	"github.com/BernardoDenkvitts/EmailSenderService/internal/infrastructure/storage"
 	"github.com/BernardoDenkvitts/EmailSenderService/internal/types"
-	"github.com/joho/godotenv"
+	"github.com/BernardoDenkvitts/EmailSenderService/utils"
 	"github.com/stretchr/testify/assert"
 )
 
-func loadEnv() {
-	path, _ := os.Getwd()
-	envPath := filepath.Join(path, "..", "..", ".env")
-	err := godotenv.Load(envPath)
-	if err != nil {
-		panic("Error to load .env in Email_test.go")
-	}
-}
-
 func getSmtpConfig() smtp.SMTPConfig {
-	loadEnv()
+	utils.LoadEnv("./../../.env")
 
 	port, err := strconv.Atoi(os.Getenv("emailport"))
 	if err != nil {

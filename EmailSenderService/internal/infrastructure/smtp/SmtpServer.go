@@ -2,19 +2,15 @@ package smtp
 
 import "gopkg.in/gomail.v2"
 
-type ISmtpServer interface {
-	SendEmail(from, to, subject, body string) error
-}
-
-type MailTrapServer struct {
+type SmtpServer struct {
 	config SMTPConfig
 }
 
-func NewMailTrapServer(config SMTPConfig) *MailTrapServer {
-	return &MailTrapServer{config: config}
+func NewSmtpServer(config SMTPConfig) *SmtpServer {
+	return &SmtpServer{config: config}
 }
 
-func (m *MailTrapServer) SendEmail(from, to, subject, body string) error {
+func (s *SmtpServer) SendEmail(from, to, subject, body string) error {
 	msg := gomail.NewMessage()
 
 	msg.SetHeader("From", from)
@@ -22,7 +18,7 @@ func (m *MailTrapServer) SendEmail(from, to, subject, body string) error {
 	msg.SetHeader("Subject", subject)
 	msg.SetBody("text/html", body)
 
-	dialer := gomail.NewDialer(m.config.Host, m.config.Port, m.config.User, m.config.Password)
+	dialer := gomail.NewDialer(s.config.Host, s.config.Port, s.config.User, s.config.Password)
 
 	return dialer.DialAndSend(msg)
 }

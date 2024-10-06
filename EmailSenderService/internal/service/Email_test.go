@@ -27,7 +27,7 @@ func getSmtpConfig() smtp.SMTPConfig {
 
 	port, err := strconv.Atoi(os.Getenv("emailport"))
 	if err != nil {
-		panic("Fail to get MailTrap Port from .env")
+		panic("Fail to get Port from .env")
 	}
 
 	return smtp.NewSMTPConfig(port, os.Getenv("emailhost"), os.Getenv("emailuser"), os.Getenv("emailpassword"))

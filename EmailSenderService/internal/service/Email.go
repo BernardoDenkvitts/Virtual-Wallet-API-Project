@@ -13,11 +13,11 @@ type IEmail interface {
 }
 
 type EmailImpl struct {
-	SmtpServer smtp.ISmtpServer
+	SmtpServer *smtp.SmtpServer
 	Storage    storage.IStorage
 }
 
-func NewEmailImpl(smtpServer smtp.ISmtpServer, storage storage.IStorage) *EmailImpl {
+func NewEmailImpl(smtpServer *smtp.SmtpServer, storage storage.IStorage) *EmailImpl {
 	return &EmailImpl{SmtpServer: smtpServer, Storage: storage}
 }
 
@@ -27,7 +27,7 @@ func (e *EmailImpl) Send(email types.EmailDTO) error {
 	var err error
 	try := 0
 
-	for try < 3 {	
+	for try < 3 {
 		err = e.SmtpServer.SendEmail(email.From, email.To, email.Subject, formatEmailMessage(email.Message))
 		if err == nil {
 			log.Println("Email sent sucessfully")

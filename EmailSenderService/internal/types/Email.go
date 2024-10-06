@@ -1,6 +1,7 @@
 package types
 
 import (
+	"os"
 	"time"
 
 	"github.com/go-playground/validator/v10"
@@ -23,9 +24,9 @@ type EmailDTO struct {
 	Message string `validate:"min=1"`
 }
 
-func NewEmailDTO(from, to, subject, message string) EmailDTO {
+func NewEmailDTO(to, subject, message string) EmailDTO {
 	return EmailDTO{
-		From:    from,
+		From:    os.Getenv("emailuser"),
 		To:      to,
 		Subject: subject,
 		Message: message,

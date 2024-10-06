@@ -3,6 +3,7 @@ package kafka
 import (
 	"encoding/json"
 	"log"
+	"os"
 
 	"github.com/BernardoDenkvitts/EmailSenderService/internal/service"
 	"github.com/BernardoDenkvitts/EmailSenderService/internal/types"
@@ -59,7 +60,7 @@ func (c *KafkaConsumer) Consume() {
 
 func createConsumer() *kafka.Consumer {
 	config := &kafka.ConfigMap{
-		"bootstrap.servers":  "localhost:9092",
+		"bootstrap.servers":  os.Getenv("kafkaserver"),
 		"group.id":           "email-id",
 		"auto.offset.reset":  "earliest",
 		"enable.auto.commit": false,

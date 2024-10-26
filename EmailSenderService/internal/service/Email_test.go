@@ -13,7 +13,7 @@ import (
 )
 
 func getSmtpConfig() smtp.SMTPConfig {
-	utils.LoadEnv("./../../.env")
+	utils.LoadEnv("./../../.env-dev")
 
 	port, err := strconv.Atoi(os.Getenv("emailport"))
 	if err != nil {

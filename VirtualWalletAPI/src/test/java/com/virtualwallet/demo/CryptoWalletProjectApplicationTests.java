@@ -20,10 +20,8 @@ import com.virtualwallet.demo.Service.Authentication.IAuthenticator;
 import com.virtualwallet.demo.Service.CryptoWallet.Client.IWalletClient;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -31,13 +29,17 @@ import org.springframework.http.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
+/*
+
+	Be sure to have application-dev.yml set as the profile to run tests
+
+ */
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestClassOrder(ClassOrderer.OrderAnnotation.class)
@@ -55,7 +57,7 @@ class CryptoWalletProjectApplicationTests
 	@BeforeAll
 	public static void setUpDB()
 	{
-		String connectionString = "mongodb://admin:admin@mongodb:27017/virtualwallet";
+		String connectionString = "mongodb://admin:admin@localhost:27010/?authSource=virtualwallet";
 		mongoClient = MongoClients.create(connectionString);
 		mongoDatabase = mongoClient.getDatabase("virtualwallet");
 		mongoTemplate = new MongoTemplate(mongoClient, "virtualwallet");
@@ -228,6 +230,26 @@ class CryptoWalletProjectApplicationTests
 					"0240dbdab2589c28dd915e597edeec12a0284b83245b2ba6743c5071aab81d6e9g",
 					"CEXAfJr5w1op3ArMS1mH2FKN5KFyyftz7c"
 			));
+
+			List<User> testEmailUser = mongoTemplate.find(
+					new Query().addCriteria(Criteria.where("email").is("testEmail@gmail.com")),
+					User.class
+			);
+			
+			User secondUser;
+			if (testEmailUser.isEmpty()) {
+				secondUser = new User(
+						null,
+						"testName",
+						"testEmail@gmail.com",
+						new BCryptPasswordEncoder().encode("password")
+				);
+				secondUser.setCryptosAddress(cryptoAddresses);
+				mongoTemplate.insert(secondUser);
+			} else {
+				secondUser = testEmailUser.get(0);
+			}
+
 			cryptoAddresses.get(CryptoType.btc).setQuantity(000005.0);
 			List<User> userExists = mongoTemplate.find(
 					new Query().addCriteria(
@@ -236,29 +258,22 @@ class CryptoWalletProjectApplicationTests
 					User.class
 			);
 
-			User newUser;
+			User firstUser;
 			if (userExists.isEmpty())
 			{
-				newUser = new User(
+				firstUser = new User(
 						null,
 						"MockUser",
-						"mockUserTest@email.com",
+						"bernardoarcari@gmail.com",
 						new BCryptPasswordEncoder().encode("1489")
 				);
-				newUser.setCryptosAddress(cryptoAddresses);
-				mongoTemplate.insert(newUser);
-			}
-			else
-			{
-				newUser = userExists.get(0);
+				firstUser.setCryptosAddress(cryptoAddresses);
+				mongoTemplate.insert(firstUser);
+			} else {
+				firstUser = userExists.get(0);
 			}
 
-			Query query = new Query();
-			query.addCriteria(Criteria.where("email").is("testEmail@gmail.com"));
-			User oldUser = mongoTemplate.findOne(query, User.class);
-
-            assert oldUser != null;
-            return List.of(newUser, oldUser);
+            return List.of(firstUser, secondUser);
 		}
 
 		@Test
@@ -275,7 +290,7 @@ class CryptoWalletProjectApplicationTests
 			transaction.setInputAddress(firstUser.getCryptosAddress().get(CryptoType.btc).getAddress());
 			transaction.setOutputAddress(secundaryUser.getCryptosAddress().get(CryptoType.btc).getAddress());
 			transaction.setQuantity(00001.0);
-			transaction.setCryptoType(CryptoType.btc);;
+			transaction.setCryptoType(CryptoType.btc);
 
 			HttpHeaders headers = new HttpHeaders();
 
@@ -289,8 +304,6 @@ class CryptoWalletProjectApplicationTests
 					TransactionResponseDTO.class
 			);
 			assertThat(response.getStatusCode()).isEqualTo(HttpStatus.ACCEPTED);
-			System.out.println(response.getBody().toString());
-			System.out.println(response.getBody().getTimestamp());
 		}
 
 		@Test

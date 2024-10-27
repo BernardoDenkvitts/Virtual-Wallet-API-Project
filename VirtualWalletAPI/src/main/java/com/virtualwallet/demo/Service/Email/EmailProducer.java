@@ -1,7 +1,6 @@
 package com.virtualwallet.demo.Service.Email;
 
 import com.virtualwallet.demo.DTO.Email.Email;
-import com.virtualwallet.demo.Service.CryptoWallet.CryptoWalletProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -16,12 +15,13 @@ public class EmailProducer {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    public void sendEmail(String userEmail, String emailMessage){
-        LOGGER.info("Sending email to user {} to email-topic", userEmail);
-        LOGGER.info("Email message: {}", emailMessage);
+    public void sendEmail(String email, String subject, String message){
+        LOGGER.info("Sending email to user {} to email-topic", email);
+        LOGGER.info("Email subject: {}", subject);
+        LOGGER.info("Email message: {}", message);
 
-        kafkaTemplate.send("email-topic", new Email(userEmail, emailMessage));
-        LOGGER.info("Email Sent");
+        kafkaTemplate.send("email-topic", new Email(email, subject, message));
+        LOGGER.info("Message sent to email-topic");
     }
 
 }

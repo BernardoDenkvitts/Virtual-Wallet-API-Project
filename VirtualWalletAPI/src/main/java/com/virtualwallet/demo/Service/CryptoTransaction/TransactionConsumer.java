@@ -8,15 +8,16 @@ import com.virtualwallet.demo.Model.User.CryptoAddress;
 import com.virtualwallet.demo.Model.User.User;
 import com.virtualwallet.demo.Repository.TransactionRepository;
 import com.virtualwallet.demo.Repository.UserRepository;
+import com.virtualwallet.demo.Service.Email.EmailProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Executor;
 
 @Service
 public class TransactionConsumer
@@ -27,25 +28,28 @@ public class TransactionConsumer
     private final UserRepository userRepository;
     private final ITransactionMapper transactionMapper;
 
-    public TransactionConsumer(TransactionRepository transactionRepository, ITransactionMapper transactionMapper, UserRepository userRepository) {
+    private final EmailProducer emailProducer;
+
+    public TransactionConsumer(TransactionRepository transactionRepository, ITransactionMapper transactionMapper, UserRepository userRepository, EmailProducer emailProducer) {
         this.transactionRepository = transactionRepository;
         this.transactionMapper = transactionMapper;
         this.userRepository = userRepository;
+        this.emailProducer = emailProducer;
     }
 
-    @Transactional
     @KafkaListener(topics = "new-transaction", groupId = "new-crypto-transaction", containerFactory = "jsonKafkaListenerContainerFactory")
     public void receiveTransactionRequest(TransactionMessage message) {
-        LOGGER.info("transaction received user {}, transaction {}", message.userInputId(), message.transactionRequestDTO().toString());
+        LOGGER.info("transaction received user {}", message.userInputId());
+        LOGGER.info("Transaction information {}; {}; {}", message.transactionRequestDTO().getCryptoType(), message.transactionRequestDTO().getQuantity(), message.transactionRequestDTO().getOutputAddress());
 
         List<User> transactionUsers = findTransactionUsers(message.userInputId(), message.transactionRequestDTO());
         User userInput = transactionUsers.get(0);
         User userOutput = transactionUsers.get(1);
 
         updateUserCryptoQuantity(
-            userInput,
-            message.transactionRequestDTO().getCryptoType(),
-            message.transactionRequestDTO().getQuantity(),
+                userInput,
+                message.transactionRequestDTO().getCryptoType(),
+                message.transactionRequestDTO().getQuantity(),
                 false
         );
 
@@ -54,9 +58,9 @@ public class TransactionConsumer
 
         if (userOutput != null) {
             updateUserCryptoQuantity(
-                userOutput,
-                message.transactionRequestDTO().getCryptoType(),
-                message.transactionRequestDTO().getQuantity(),
+                    userOutput,
+                    message.transactionRequestDTO().getCryptoType(),
+                    message.transactionRequestDTO().getQuantity(),
                     true
             );
             usersToSave.add(userOutput);
@@ -67,8 +71,13 @@ public class TransactionConsumer
         );
         userRepository.saveAll(usersToSave);
 
-        LOGGER.info("transaction from {} to {} processed",
-                message.transactionRequestDTO().getInputAddress(), message.transactionRequestDTO().getOutputAddress());
+        String emailMessage = String.format("Your %f %s transaction was completed successfully", message.transactionRequestDTO().getQuantity(), message.transactionRequestDTO().getCryptoType());
+        emailProducer.sendEmail(userInput.getEmail(), "Crypto Transaction Completed", emailMessage);
+
+        LOGGER.info(
+                "transaction from {} to {} processed",
+                message.transactionRequestDTO().getInputAddress(), message.transactionRequestDTO().getOutputAddress()
+        );
     }
 
     private List<User> findTransactionUsers(String userInputID, TransactionRequestDTO transactionRequestDTO)

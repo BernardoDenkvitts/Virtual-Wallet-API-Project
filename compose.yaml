@@ -19,20 +19,29 @@ services:
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
       KAFKA_DELETE_TOPIC_ENABLE: 'true'
 
+  postgres: 
+      image: postgres:16.3-alpine3.20
+      restart: always
+      container_name: postgres
+      ports:
+        - 5432:5432
+      environment:
+        POSTGRES_PASSWORD: root
+
   mongodb:
-    image: mongo:latest
-    container_name: docker_mongo
-    environment:
-      - MONGO_INITDB_DATABASE=virtualwallet
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=admin
-    ports:
-      - "27010:27017"
-    extra_hosts:
-      - "host.docker.internal:172.17.0.1"
-    volumes:
-      - walletdata:/tmp/data/db
-      - ./VirtualWalletAPI/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro
+     image: mongo:latest
+     container_name: docker_mongo
+     environment:
+       - MONGO_INITDB_DATABASE=virtualwallet
+       - MONGO_INITDB_ROOT_USERNAME=admin
+       - MONGO_INITDB_ROOT_PASSWORD=admin
+     ports:
+       - "27010:27017"
+     extra_hosts:
+       - "host.docker.internal:172.17.0.1"
+     volumes:
+       - walletdata:/tmp/data/db
+       - ./VirtualWalletAPI/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro
 
 volumes:
   walletdata:

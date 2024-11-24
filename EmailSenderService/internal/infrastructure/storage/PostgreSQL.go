@@ -2,7 +2,9 @@ package storage
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
+	"os"
 
 	_ "github.com/lib/pq"
 
@@ -13,8 +15,18 @@ type PostgreSQL struct {
 	db *sql.DB
 }
 
+func connection_string() string {
+	user := os.Getenv("databaseuser")
+	host := os.Getenv("databasehost")
+	password := os.Getenv("databasepswd")
+	name := os.Getenv("databasename")
+	connectionString := fmt.Sprintf("host=%s user=%s dbname=%s password=%s sslmode=disable", host, user, name, password)
+
+	return connectionString
+}
+
 func NewPostgreStorage() *PostgreSQL {
-	db, err := sql.Open("postgres", "user=postgres dbname=postgres password=root sslmode=disable")
+	db, err := sql.Open("postgres", connection_string())
 	if err != nil {
 		panic(err)
 	}

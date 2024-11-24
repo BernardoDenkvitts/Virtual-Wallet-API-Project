@@ -1,11 +1,65 @@
-
+version: "3.8"
 services:
+  app:
+    container_name: spring-app
+    build:
+      context: ./VirtualWalletAPI
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+      - 35729:35729
+    depends_on:
+      - mongodb
+      - kafka
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1"
+
+  email_service:
+    container_name: email-service
+    build: 
+      context: ./EmailSenderService
+      dockerfile: Dockerfile
+    
+    platform: linux/amd64
+    
+    ports:
+      - 81:81
+    depends_on:
+      - postgres
+      - kafka
+    extra_hosts:
+       - "host.docker.internal:172.17.0.1"
+  
+  mongodb:
+    image: mongo:latest
+    container_name: docker_mongo
+    environment:
+      - MONGO_INITDB_DATABASE=virtualwallet
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin
+    ports:
+      - "27017:27017"
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1"
+    volumes:
+      - walletdata:/tmp/data/db
+      - ./VirtualWalletAPI/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro
+
+  postgres:
+    image: postgres:16.3-alpine3.20
+    restart: always
+    container_name: postgres
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: root
+    extra_hosts:
+       - "host.docker.internal:172.17.0.1"
 
   zookeeper:
     image: wurstmeister/zookeeper:latest
     ports:
       - "2181:2181"
-
   kafka:
     image: wurstmeister/kafka:latest
     ports:
@@ -13,35 +67,11 @@ services:
     links:
       - zookeeper
     environment:
-      KAFKA_ADVERTISED_HOST_NAME: localhost
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_ADVERTISED_HOST_NAME: kafka
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
       KAFKA_DELETE_TOPIC_ENABLE: 'true'
-
-  postgres: 
-      image: postgres:16.3-alpine3.20
-      restart: always
-      container_name: postgres
-      ports:
-        - 5432:5432
-      environment:
-        POSTGRES_PASSWORD: root
-
-  mongodb:
-     image: mongo:latest
-     container_name: docker_mongo
-     environment:
-       - MONGO_INITDB_DATABASE=virtualwallet
-       - MONGO_INITDB_ROOT_USERNAME=admin
-       - MONGO_INITDB_ROOT_PASSWORD=admin
-     ports:
-       - "27010:27017"
-     extra_hosts:
-       - "host.docker.internal:172.17.0.1"
-     volumes:
-       - walletdata:/tmp/data/db
-       - ./VirtualWalletAPI/init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh:ro
 
 volumes:
   walletdata:

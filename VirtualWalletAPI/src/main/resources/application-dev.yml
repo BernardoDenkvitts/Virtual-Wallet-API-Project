@@ -23,7 +23,7 @@ api:
       secret: walletsecret
 
 
-token: d1dd02bd3a714b93bc964236bf604075 # Your personal blockcypher token here
+token: # Your personal blockcypher token here
 external:
   api:
     url: https://api.blockcypher.com/v1

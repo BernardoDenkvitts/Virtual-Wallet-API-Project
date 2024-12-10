@@ -1,6 +1,9 @@
-#!/bin/bash
+#!/usr/bin/bash
+
 set -e
-mongosh <<EOF
+
+mongosh -u admin -p admin --authenticationDatabase admin <<EOF
+
   use virtualwallet
   db.createUser(
       {

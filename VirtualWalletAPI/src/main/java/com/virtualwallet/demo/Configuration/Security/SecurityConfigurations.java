@@ -48,17 +48,19 @@ public class SecurityConfigurations {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(sessionMng -> sessionMng.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests((it) ->
-                        it.requestMatchers(authEndpoint)
+                        it.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "swagger-ui.html")
+                                .permitAll()
+                        .requestMatchers(authEndpoint)
                                 .permitAll()
 
-                                .requestMatchers(HttpMethod.POST, HttpMethod.GET, transactionEndpoint)
-                                    .hasAnyRole(Roles.USER.name(), Roles.ADMIN.name())
+                        .requestMatchers(HttpMethod.POST, HttpMethod.GET, transactionEndpoint)
+                            .hasAnyRole(Roles.USER.name(), Roles.ADMIN.name())
 
-                                .requestMatchers(HttpMethod.GET, userEndpoint)
-                                    .hasAnyRole(Roles.USER.name(), Roles.ADMIN.name())
+                        .requestMatchers(HttpMethod.GET, userEndpoint)
+                            .hasAnyRole(Roles.USER.name(), Roles.ADMIN.name())
 
-                                .anyRequest()
-                                .authenticated()
+                        .anyRequest()
+                        .authenticated()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .httpBasic(Customizer.withDefaults())
